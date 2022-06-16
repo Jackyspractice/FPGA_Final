@@ -1,21 +1,18 @@
 `timescale 1ms/1ns
-module tb_counter_to_BCD();
+module tb_counter_to_BCD(
+    //real input
+    input clk,
+    input inc_short,
+    input inc_long,
+    input set,
+    input sw,
+    input reset,
 
-//real input
-reg inc_short;
-reg inc_long;
-reg set;
-reg sw;
+    //real output
+    output [3:0] scan,
+    output [6:0] decoder_out
+);
 
-//real output
-reg [3:0] scan;
-reg [6:0] decoder_out;
-
-//tb input
-reg clk;
-reg reset;
-
-//tb output
 /*******************************************/
 //clkdiv out
 wire clk_10000Hz;
@@ -132,7 +129,7 @@ mux_time_mode mux_time_mode(
     .min_ONES(min_ONES),
     .min_TENS(min_TENS),
     .hr_ONES(hr_ONES),
-    .hr_TENS(hr_TENS)
+    .hr_TENS(hr_TENS),
 
     .left_ONES(left_ONES),
     .left_TENS(left_TENS),
@@ -156,16 +153,4 @@ sev_decoder sev_decoder(
     .seg(decoder_out)
 );
 
-always #1 clk = ~clk;
-
-initial begin
-    clk = 0;
-    reset = 1;
-    inc_short = 0;
-    inc_long = 0;
-    set = 0;
-    sw = 0;
-    #10
-    reset = 0;
-end
 endmodule 

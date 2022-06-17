@@ -10,7 +10,8 @@ module top_time(
     //real output
     output [3:0] scan,
     output [6:0] decoder_out,
-    output [3:0] state
+    output [3:0] state,
+    output beep
 );
 
 /*******************************************/
@@ -59,36 +60,45 @@ wire time_setting_enable;
 wire time_hr_or_min;//regtime, to choose mode setting hr0 or min1
 wire regalarm_setting_enable;
 wire regalarm_hr_or_min;//regalarm, to choose mode setting hr0 or min1
+wire stopwatch_count_enable;
+wire stopwatch_reset;
+/*******************************************/
+//stopwatch out
+wire [13:0] small_from_stopwatch;
+/*******************************************/
+//alarm out
+wire [13:0] hour_from_alarm;
+wire [13:0] min_from_alarm;
 /*******************************************/
 
 debounce debounce_inc_short(
     .inp(inc_short),
-    .clk(clk),
+    .clk(clk_10000Hz),
 
     .outp(db_inc_short)
 );
 
 debounce debounce_inc_long(
     .inp(inc_long),
-    .clk(clk),
+    .clk(clk_10000Hz),
 
     .outp(db_inc_long)
 );
 debounce debounce_set(
     .inp(set),
-    .clk(clk),
+    .clk(clk_10000Hz),
 
     .outp(db_set)
 );
 debounce debounce_sw(
     .inp(sw),
-    .clk(clk),
+    .clk(clk_10000Hz),
 
     .outp(db_sw)
 );
 
 FSM FSM(
-    .clk(clk),
+    .clk(clk_10000Hz),
     .inc_short(db_inc_short),
     .inc_long(db_inc_long),
     .set(db_set),
@@ -101,6 +111,8 @@ FSM FSM(
     .time_hr_or_min(time_hr_or_min),
     .regalarm_setting_enable(regalarm_setting_enable),
     .regalarm_hr_or_min(regalarm_hr_or_min),
+    .stopwatch_count_enable(stopwatch_count_enable),
+    .stopwatch_reset(stopwatch_reset),
     .state(state)
 );
 clkdiv clkdiv(
@@ -148,6 +160,28 @@ Bigger_BCD counter_BCD(
     .hr_ONES(hr_ONES),
     .hr_TENS(hr_TENS)
 );
+
+stopwath_counter stopwath_counter(
+    .clk_10000Hz(clk_10000Hz),
+    .count_enable(stopwatch_count_enable),
+    .reset(stopwatch_reset),
+
+    .small_sec_out(small_from_stopwatch)
+);
+
+alarm alarm(
+    .setting_enable(regalarm_setting_enable),
+    .set_hr_or_min(regalarm_hr_or_min),
+    .inc_short(db_inc_short),
+    .hour(hours),
+    .minute(minutes),
+
+    .beep(beep),
+    .hour_out(hour_from_alarm),
+    .minute_out(min_from_alarm)
+);
+
+
 mux_time_mode mux_time_mode(
     .hr_or_min(mux_outmode),
     .second_ONES(second_ONES),

@@ -17,6 +17,8 @@ module FSM(
     output reg time_hr_or_min,//regtime, to choose mode setting hr0 or min1
     output reg regalarm_setting_enable,
     output reg regalarm_hr_or_min,//regalarm, to choose mode setting hr0 or min1
+    output reg stopwatch_count_enable,
+    output reg stopwatch_reset,
     output reg [3:0] state
 );
 
@@ -48,6 +50,7 @@ always @(state, inc_short, inc_long, set, sw) begin
             mux <= 2'b00;
             time_setting_enable <= 0;
             regalarm_setting_enable <= 0;
+            stopwatch_count_enable <= 0;
             stateNext = hr_min;
             if (inc_short == 1 && inc_long == 0 && set == 0 && sw == 0) stateNext = min_sec;
             else if (inc_short == 0 && inc_long == 0 && set == 1 && sw == 0) stateNext = set_hr;
@@ -61,6 +64,7 @@ always @(state, inc_short, inc_long, set, sw) begin
             mux <= 2'b00;
             time_setting_enable <= 0;
             regalarm_setting_enable <= 0;
+            stopwatch_count_enable <= 0;
             stateNext = min_sec;
             if (inc_short == 1 && inc_long == 0 && set == 0 && sw == 0) stateNext = hr_min;
             else if (inc_short == 0 && inc_long == 0 && set == 1 && sw == 0) stateNext = set_hr;
@@ -75,6 +79,7 @@ always @(state, inc_short, inc_long, set, sw) begin
             time_setting_enable <= 1;
             time_hr_or_min <= 0;
             regalarm_setting_enable <= 0;
+            stopwatch_count_enable <= 0;
             stateNext = set_hr;
             if (inc_short == 0 && inc_long == 0 && set == 1 && sw == 0) stateNext = set_min;
         end
@@ -86,6 +91,7 @@ always @(state, inc_short, inc_long, set, sw) begin
             time_setting_enable <= 1;
             time_hr_or_min <= 1;
             regalarm_setting_enable <= 0;
+            stopwatch_count_enable <= 0;
             stateNext = set_min;
             if (inc_short == 0 && inc_long == 0 && set == 1 && sw == 0) stateNext = hr_min;
         end
@@ -96,6 +102,8 @@ always @(state, inc_short, inc_long, set, sw) begin
             mux <= 2'b10;
             time_setting_enable <= 0;
             regalarm_setting_enable <= 1;
+            regalarm_hr_or_min <= 0;
+            stopwatch_count_enable <= 0;
             stateNext = set_alarm_hr;
             if (inc_short == 0 && inc_long == 0 && set == 1 && sw == 0) stateNext = set_alarm_min;
         end
@@ -106,6 +114,8 @@ always @(state, inc_short, inc_long, set, sw) begin
             mux <= 2'b10;
             time_setting_enable <= 0;
             regalarm_setting_enable <= 1;
+            regalarm_hr_or_min <= 1;
+            stopwatch_count_enable <= 0;
             stateNext = set_alarm_min;
             if (inc_short == 0 && inc_long == 0 && set == 1 && sw == 0) stateNext = hr_min;
         end
@@ -115,7 +125,9 @@ always @(state, inc_short, inc_long, set, sw) begin
             mux_outmode <= 0;
             mux <= 2'b11;
             time_setting_enable <= 0;
-            regalarm_setting_enable <= 1;
+            regalarm_setting_enable <= 0;
+            stopwatch_count_enable <= 0;
+            stopwatch_reset <= 1;
             stateNext = stopwatch_idle;
             if (inc_short == 0 && inc_long == 0 && set == 0 && sw == 1) stateNext = stopwatch_start;
             else if (inc_short == 0 && inc_long == 0 && set == 1 && sw == 0) stateNext = hr_min;
@@ -127,6 +139,8 @@ always @(state, inc_short, inc_long, set, sw) begin
             mux <= 2'b11;
             time_setting_enable <= 0;
             regalarm_setting_enable <= 0;
+            stopwatch_count_enable <= 1;
+            stopwatch_reset <= 0;
             stateNext = stopwatch_start;
             if (inc_short == 0 && inc_long == 0 && set == 0 && sw == 1) stateNext = stopwatch_pause;
         end
@@ -137,6 +151,8 @@ always @(state, inc_short, inc_long, set, sw) begin
             mux <= 2'b11;
             time_setting_enable <= 0;
             regalarm_setting_enable <= 0;
+            stopwatch_count_enable <= 0;
+            stopwatch_reset <= 0;
             stateNext = stopwatch_pause;
             if (inc_short == 1 && inc_long == 0 && set == 0 && sw == 0) stateNext = stopwatch_idle;
         end

@@ -35,7 +35,8 @@ wire [3:0] right_TENS;
 //mux_to_sevseg out
 wire [3:0] to_sevseg;
 /*******************************************/
-//
+//debounce out
+wire db_inc_short, db_inc_long, db_set, db_sw;
 /*******************************************/
 //BCDs outs
 wire [3:0] small_ONES, small_TENS, small_HUNDREDS, small_thousands;
@@ -59,12 +60,38 @@ wire regalarm_setting_enable;
 wire regalarm_hr_or_min;//regalarm, to choose mode setting hr0 or min1
 /*******************************************/
 
+debounce debounce_inc_short(
+    .inp(inc_short),
+    .clk(clk),
+
+    .outp(db_inc_short)
+);
+
+debounce debounce_inc_long(
+    .inp(inc_long),
+    .clk(clk),
+
+    .outp(db_inc_long)
+);
+debounce debounce_set(
+    .inp(set),
+    .clk(clk),
+
+    .outp(db_set)
+);
+debounce debounce_sw(
+    .inp(sw),
+    .clk(clk),
+
+    .outp(db_sw)
+);
+
 FSM FSM(
     .clk(clk),
-    .inc_short(inc_short),
-    .inc_long(inc_long),
-    .set(set),
-    .sw(sw),
+    .inc_short(db_inc_short),
+    .inc_long(db_inc_long),
+    .set(db_set),
+    .sw(db_sw),
     
     .counter_enable(counter_enable),
     .mux(mux),
@@ -95,7 +122,7 @@ counter counter(
     .enable(counter_enable),
     .setting_enable(time_setting_enable),
     .set_hr_or_min(time_hr_or_min),
-    .inc_short(inc_short),
+    .inc_short(db_inc_short),
 
     .seconds_out(seconds), 
     .minutes_out(minutes), 

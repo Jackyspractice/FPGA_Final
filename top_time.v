@@ -1,12 +1,11 @@
 `timescale 1ms/1ns
-module tb_counter_to_BCD(
+module top_time(
     //real input
     input clk,
     input inc_short,
     input inc_long,
     input set,
     input sw,
-    input reset,
 
     //real output
     output [3:0] scan,
@@ -60,7 +59,7 @@ wire regalarm_setting_enable;
 wire regalarm_hr_or_min;//regalarm, to choose mode setting hr0 or min1
 /*******************************************/
 
-FSM test(
+FSM FSM(
     .clk(clk),
     .inc_short(inc_short),
     .inc_long(inc_long),
@@ -83,7 +82,6 @@ clkdiv clkdiv(
 );
 control_which_scan control_which_scan(
     .clk(clk_scan),
-    .clr(reset),
 
     .sel(sel)
 );
@@ -94,7 +92,6 @@ sev_scan sev_scan(
 );
 counter counter(
     .clk(clk_10000Hz),
-    .reset(reset), 
     .enable(counter_enable),
     .setting_enable(time_setting_enable),
     .set_hr_or_min(time_hr_or_min),

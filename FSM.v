@@ -16,13 +16,14 @@ module FSM(
     output reg time_setting_enable,
     output reg time_hr_or_min,//regtime, to choose mode setting hr0 or min1
     output reg regalarm_setting_enable,
-    output reg regalarm_hr_or_min//regalarm, to choose mode setting hr0 or min1
+    output reg regalarm_hr_or_min,//regalarm, to choose mode setting hr0 or min1
+    output reg [3:0] state
 );
 
 parameter hr_min = 0, min_sec = 1, set_hr = 2, set_min = 3, set_alarm_hr = 4, set_alarm_min = 5,
     stopwatch_idle = 6, stopwatch_start = 7, stopwatch_pause = 8;
 
-reg [3:0] state, stateNext;
+reg [3:0] stateNext;
 
 initial begin
     

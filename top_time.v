@@ -9,7 +9,8 @@ module top_time(
 
     //real output
     output [3:0] scan,
-    output [6:0] decoder_out
+    output [6:0] decoder_out,
+    output [3:0] state
 );
 
 /*******************************************/
@@ -99,7 +100,8 @@ FSM FSM(
     .time_setting_enable(time_setting_enable),
     .time_hr_or_min(time_hr_or_min),
     .regalarm_setting_enable(regalarm_setting_enable),
-    .regalarm_hr_or_min(regalarm_hr_or_min)
+    .regalarm_hr_or_min(regalarm_hr_or_min),
+    .state(state)
 );
 clkdiv clkdiv(
     .mclk(clk),

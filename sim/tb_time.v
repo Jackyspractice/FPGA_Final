@@ -30,6 +30,9 @@ wire [3:0] left_ONES;
 wire [3:0] left_TENS;
 wire [3:0] right_ONES;
 wire [3:0] right_TENS;
+//clkdiv out
+wire clk_10000Hz;
+wire clk_scan;
 /*******************************************/
 //mux_to_sevseg out
 wire [3:0] to_sevseg;
@@ -58,6 +61,13 @@ wire time_hr_or_min;//regtime, to choose mode setting hr0 or min1
 wire regalarm_setting_enable;
 wire regalarm_hr_or_min;//regalarm, to choose mode setting hr0 or min1
 /*******************************************/
+clkdiv clkdiv(
+    .mclk(clk),
+
+    .clk_counter(clk_10000Hz),
+    .clk_scan(clk_scan)
+);
+
 
 debounce debounce_inc_short(
     .inp(inc_short),

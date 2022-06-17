@@ -1,41 +1,26 @@
 `timescale 1ms/1ns
-module top_time(
-    //real input
-    input clk,
-    input inc_short,
-    input inc_long,
-    input set,
-    input sw,
+module tb_FSM_counter();
 
-    //real output
-    output [3:0] scan,
-    output [6:0] decoder_out,
-    output [3:0] state
-);
+reg clk;
+reg inc_short;
+reg inc_long;
+reg set;
+reg sw;
 
-/*******************************************/
-//clkdiv out
-wire clk_10000Hz;
-wire clk_scan;
-/*******************************************/
-//which out
-wire [1:0] sel;
-/*******************************************/
-//counter out
+wire [3:0] scan;
+wire [6:0] decoder_out;
+
+
+
 wire [13:0] seconds;
 wire [13:0] minutes;
 wire [13:0] hours;
 wire [13:0] small_sec;
-/*******************************************/
-//mux_time_mode out
-wire [3:0] left_ONES;
-wire [3:0] left_TENS;
-wire [3:0] right_ONES;
-wire [3:0] right_TENS;
-/*******************************************/
+//clkdiv out
+wire clk_10000Hz;
+wire clk_scan;
 //mux_to_sevseg out
 wire [3:0] to_sevseg;
-/*******************************************/
 //debounce out
 wire db_inc_short, db_inc_long, db_set, db_sw;
 /*******************************************/
@@ -45,7 +30,8 @@ wire [3:0] second_ONES, second_TENS;
 wire [3:0] min_ONES, min_TENS;
 wire [3:0] hr_ONES, hr_TENS;
 /*******************************************/
-
+//which out
+wire [1:0] sel;
 /*******************************************/
 //FSM out
 wire counter_enable;
@@ -60,49 +46,13 @@ wire time_hr_or_min;//regtime, to choose mode setting hr0 or min1
 wire regalarm_setting_enable;
 wire regalarm_hr_or_min;//regalarm, to choose mode setting hr0 or min1
 /*******************************************/
-
-debounce debounce_inc_short(
-    .inp(inc_short),
-    .clk(clk),
-
-    .outp(db_inc_short)
-);
-
-debounce debounce_inc_long(
-    .inp(inc_long),
-    .clk(clk),
-
-    .outp(db_inc_long)
-);
-debounce debounce_set(
-    .inp(set),
-    .clk(clk),
-
-    .outp(db_set)
-);
-debounce debounce_sw(
-    .inp(sw),
-    .clk(clk),
-
-    .outp(db_sw)
-);
-
-FSM FSM(
-    .clk(clk),
-    .inc_short(db_inc_short),
-    .inc_long(db_inc_long),
-    .set(db_set),
-    .sw(db_sw),
-    
-    .counter_enable(counter_enable),
-    .mux(mux),
-    .mux_outmode(mux_outmode),
-    .time_setting_enable(time_setting_enable),
-    .time_hr_or_min(time_hr_or_min),
-    .regalarm_setting_enable(regalarm_setting_enable),
-    .regalarm_hr_or_min(regalarm_hr_or_min),
-    .state(state)
-);
+/*******************************************/
+//mux_time_mode out
+wire [3:0] left_ONES;
+wire [3:0] left_TENS;
+wire [3:0] right_ONES;
+wire [3:0] right_TENS;
+/*******************************************/
 clkdiv clkdiv(
     .mclk(clk),
 
@@ -119,18 +69,64 @@ sev_scan sev_scan(
 
     .scan(scan)
 );
-counter counter(
-    .clk_10000Hz(clk_10000Hz),
-    .enable(counter_enable),
-    .setting_enable(time_setting_enable),
-    .set_hr_or_min(time_hr_or_min),
-    .inc_short(db_inc_short),
 
-    .seconds_out(seconds), 
-    .minutes_out(minutes), 
-    .small_sec_out(small_sec),  
-    .hours_out(hours)
+debounce debounce_inc_short(
+    .inp(inc_short),
+    .clk(clk_10000Hz),
+
+    .outp(db_inc_short)
 );
+
+debounce debounce_inc_long(
+    .inp(inc_long),
+    .clk(clk_10000Hz),
+
+    .outp(db_inc_long)
+);
+debounce debounce_set(
+    .inp(set),
+    .clk(clk_10000Hz),
+
+    .outp(db_set)
+);
+debounce debounce_sw(
+    .inp(sw),
+    .clk(clk_10000Hz),
+
+    .outp(db_sw)
+);
+
+mux_time_mode mux_time_mode(
+    .hr_or_min(mux_outmode),
+    .second_ONES(second_ONES),
+    .second_TENS(second_TENS),
+    .min_ONES(min_ONES),
+    .min_TENS(min_TENS),
+    .hr_ONES(hr_ONES),
+    .hr_TENS(hr_TENS),
+
+    .left_ONES(left_ONES),
+    .left_TENS(left_TENS),
+    .right_ONES(right_ONES),
+    .right_TENS(right_TENS)
+);
+
+FSM FSM(
+    .clk(clk_10000Hz),
+    .inc_short(db_inc_short),
+    .inc_long(db_inc_long),
+    .set(db_set),
+    .sw(db_sw),
+    
+    .counter_enable(counter_enable),
+    .mux(mux),
+    .mux_outmode(mux_outmode),
+    .time_setting_enable(time_setting_enable),
+    .time_hr_or_min(time_hr_or_min),
+    .regalarm_setting_enable(regalarm_setting_enable),
+    .regalarm_hr_or_min(regalarm_hr_or_min)
+);
+
 Bigger_BCD counter_BCD(
     .small_sec_in(small_sec),
     .sec_in(seconds),
@@ -148,21 +144,19 @@ Bigger_BCD counter_BCD(
     .hr_ONES(hr_ONES),
     .hr_TENS(hr_TENS)
 );
-mux_time_mode mux_time_mode(
-    .hr_or_min(mux_outmode),
-    .second_ONES(second_ONES),
-    .second_TENS(second_TENS),
-    .min_ONES(min_ONES),
-    .min_TENS(min_TENS),
-    .hr_ONES(hr_ONES),
-    .hr_TENS(hr_TENS),
 
-    .left_ONES(left_ONES),
-    .left_TENS(left_TENS),
-    .right_ONES(right_ONES),
-    .right_TENS(right_TENS)
+counter counter(
+    .clk_10000Hz(clk_10000Hz),
+    .enable(counter_enable),
+    .setting_enable(time_setting_enable),
+    .set_hr_or_min(time_hr_or_min),
+    .inc_short(db_inc_short),
+
+    .seconds_out(seconds), 
+    .minutes_out(minutes), 
+    .small_sec_out(small_sec),  
+    .hours_out(hours)
 );
-
 mux_to_sevseg mux_to_sevseg(
     .sel(sel),
     .left_ONES(left_ONES),
@@ -172,11 +166,33 @@ mux_to_sevseg mux_to_sevseg(
 
     .to_sevseg(to_sevseg)
 );
-
 sev_decoder sev_decoder(
     .x(to_sevseg),
 
     .seg(decoder_out)
 );
+
+
+
+always #5 clk = ~clk;
+
+initial begin
+
+    //initialize
+    clk = 0;
+    inc_long = 0;
+    inc_short = 0;
+    sw = 0;
+    set = 0;
+    //start
+    #100000
+    set = 1;
+    #330000
+    set = 0;
+    #430000
+    inc_short = 1;
+    #330000
+    inc_short = 0;
+end
 
 endmodule 

@@ -1,6 +1,6 @@
 //out hr[5:0], min[6], sec[6]
 module counter(
-    input clk,
+    input clk_10000Hz,
     input enable,
     input setting_enable,
     input set_hr_or_min, //hr0, min1
@@ -24,7 +24,8 @@ initial begin
     hours <= 0;
 end
 
-always @(posedge clk or posedge inc_short)
+
+always @(posedge clk_10000Hz)
     begin
         
         small_sec_out <= small_sec;
@@ -61,19 +62,19 @@ always @(posedge clk or posedge inc_short)
                 end
                 else hours_out <= hours;
                 
-         end
+        end
 
         else if (setting_enable == 1) begin
 
             if (set_hr_or_min == 0) begin //hr
 
                 if (inc_short == 1) begin
-                    hours = hours + 1;
-                    if (hours == 24) begin
-                        hours <= 0;
+                    hours <= hours + 1;
+                    if (hours == 23) begin
                         hours_out <= 0;
+                        hours <= 0;
                     end
-                    else hours_out = hours;
+                    else hours_out <= hours;
                 end
 
             end
@@ -81,12 +82,12 @@ always @(posedge clk or posedge inc_short)
             else if (set_hr_or_min == 1) begin //min
 
                 if (inc_short == 1) begin
-                    minutes = minutes + 1;
-                    if (minutes == 60) begin
-                        minutes <= 0;
+                    minutes <= minutes + 1;
+                    if (minutes == 59) begin
                         minutes_out <= 0;
+                        minutes <= 0;
                     end
-                    else minutes_out = minutes;
+                    else minutes_out <= minutes;
                 end
 
             end

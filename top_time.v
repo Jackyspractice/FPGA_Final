@@ -46,7 +46,21 @@ wire [3:0] second_ONES, second_TENS;
 wire [3:0] min_ONES, min_TENS;
 wire [3:0] hr_ONES, hr_TENS;
 /*******************************************/
-
+//stopwatch BCD out
+wire [3:0] stopwatch_ONES;
+wire [3:0] stopwatch_TENS;
+wire [3:0] stopwatch_HUNDREDS;
+wire [3:0] stopwatch_thousands;
+//alarm BCD out
+wire [3:0] alarm_hr_ONES;
+wire [3:0] alarm_hr_TENS;
+wire [3:0] alarm_min_ONES;
+wire [3:0] alarm_min_TENS;
+//final mux out
+wire [3:0] to_sev_left_one;
+wire [3:0] to_sev_left_ten;
+wire [3:0] to_sev_right_one;
+wire [3:0] to_sev_right_ten;
 /*******************************************/
 //FSM out
 wire counter_enable;
@@ -169,6 +183,15 @@ stopwath_counter stopwath_counter(
     .small_sec_out(small_from_stopwatch)
 );
 
+BCD stopwatch_BCD(
+    .A(small_from_stopwatch),
+
+    .ONES(stopwatch_ONES),
+    .TENS(stopwatch_TENS),
+    .HUNDREDS(stopwatch_HUNDREDS),
+    .thousands(stopwatch_thousands)
+);
+
 alarm alarm(
     .setting_enable(regalarm_setting_enable),
     .set_hr_or_min(regalarm_hr_or_min),
@@ -176,11 +199,48 @@ alarm alarm(
     .hour(hours),
     .minute(minutes),
 
-    .beep(beep),
+    .beep_out(beep),
     .hour_out(hour_from_alarm),
     .minute_out(min_from_alarm)
 );
 
+BCD alarm_hr_BCD(
+    .A(hour_from_alarm),
+
+    .ONES(alarm_hr_ONES),
+    .TENS(alarm_hr_TENS)
+);
+
+BCD alarm_min_BCD(
+    .A(min_from_alarm),
+
+    .ONES(alarm_min_ONES),
+    .TENS(alarm_min_TENS)
+);
+
+mux_final mux_final(
+    .mode(mux),
+
+    .counter_left_one(left_ONES),
+    .counter_left_ten(left_TENS),
+    .counter_right_one(right_ONES),
+    .counter_right_ten(right_TENS),
+
+    .alarm_left_one(alarm_hr_ONES),
+    .alarm_left_ten(alarm_hr_TENS),
+    .alarm_right_one(alarm_min_ONES),
+    .alarm_right_ten(alarm_min_TENS),
+
+    .stopwatch_one(stopwatch_ONES),
+    .stopwatch_ten(stopwatch_TENS),
+    .stopwatch_hun(stopwatch_HUNDREDS),
+    .stopwatch_thousand(stopwatch_thousands),
+
+    .left_one(to_sev_left_one),
+    .left_ten(to_sev_left_ten),
+    .right_one(to_sev_right_one),
+    .right_ten(to_sev_right_ten)
+);
 
 mux_time_mode mux_time_mode(
     .hr_or_min(mux_outmode),
@@ -199,10 +259,10 @@ mux_time_mode mux_time_mode(
 
 mux_to_sevseg mux_to_sevseg(
     .sel(sel),
-    .left_ONES(left_ONES),
-    .left_TENS(left_TENS),
-    .right_ONES(right_ONES),
-    .right_TENS(right_TENS),
+    .left_ONES(to_sev_left_one),
+    .left_TENS(to_sev_left_ten),
+    .right_ONES(to_sev_right_one),
+    .right_TENS(to_sev_right_ten),
 
     .to_sevseg(to_sevseg)
 );

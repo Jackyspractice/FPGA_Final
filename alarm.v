@@ -4,7 +4,6 @@ module alarm(
     input inc_short,
     input [13:0] hour,
     input [13:0] minute,
-    
     output reg beep,
     output reg [13:0] hour_out,
     output reg [13:0] minute_out

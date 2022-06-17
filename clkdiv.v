@@ -16,7 +16,7 @@ begin
     q <= q + 1'b1;
 end
 
-assign clk_counter = q[13]; //10000Hz
-assign clk_scan = q[11];
+assign clk_counter = q[12]; //10000Hz
+assign clk_scan = q[10];
 
 endmodule

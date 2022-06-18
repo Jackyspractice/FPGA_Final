@@ -4,25 +4,29 @@ module alarm(
     input inc_short,
     input [13:0] hour,
     input [13:0] minute,
-    output reg beep,
+    
+    output wire beep_out,
     output reg [13:0] hour_out,
     output reg [13:0] minute_out
 );
 
+reg beep;
 reg [13:0] hour_alarm;
 reg [13:0] minute_alarm;
 
+assign beep_out = beep;
+
+
 initial begin
     hour_alarm <= 0;
-    minute_alarm <= 0;
-    beep <= 0;
+    minute_alarm <= 58;
 end
 
-always @(*) begin
-    if ( hour == hour_alarm && minute == minute_alarm)
-        beep = 1;
+always @(hour ,minute) begin
+    if ( hour == hour_alarm && minute == minute_alarm )
+        beep <= 1;
     else
-        beep = 0;
+        beep <= 0;
 end
 
 always @(posedge inc_short) begin
@@ -32,7 +36,7 @@ always @(posedge inc_short) begin
 
                 if (inc_short == 1) begin
                     hour_alarm <= hour_alarm + 1;
-                    if (hour_alarm == 23) begin
+                    if (hour_alarm == 24) begin
                         hour_out <= 0;
                         hour_alarm <= 0;
                     end
@@ -45,7 +49,7 @@ always @(posedge inc_short) begin
 
                 if (inc_short == 1) begin
                     minute_alarm <= minute_alarm + 1;
-                    if (minute_alarm == 59) begin
+                    if (minute_alarm == 60) begin
                         minute_out <= 0;
                         minute_alarm <= 0;
                     end
@@ -57,4 +61,5 @@ always @(posedge inc_short) begin
     end
 
     end
+
 endmodule

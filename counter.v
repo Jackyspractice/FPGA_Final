@@ -24,7 +24,6 @@ initial begin
     hours <= 0;
 end
 
-
 always @(posedge clk_10000Hz)
     begin
         

@@ -1,9 +1,7 @@
-`timescale 1ms/1ns
 module top_time(
     //real input
     input clk,
-    input inc_short,
-    input inc_long,
+    input inc,
     input set,
     input sw,
 
@@ -14,6 +12,10 @@ module top_time(
     output beep
 );
 
+/*******************************************/
+//short or long out
+wire db_inc_short;
+wire db_inc_long;
 /*******************************************/
 //clkdiv out
 wire clk_10000Hz;
@@ -38,7 +40,7 @@ wire [3:0] right_TENS;
 wire [3:0] to_sevseg;
 /*******************************************/
 //debounce out
-wire db_inc_short, db_inc_long, db_set, db_sw;
+wire db_set, db_sw;
 /*******************************************/
 //BCDs outs
 wire [3:0] small_ONES, small_TENS, small_HUNDREDS, small_thousands;
@@ -84,20 +86,14 @@ wire [13:0] small_from_stopwatch;
 wire [13:0] hour_from_alarm;
 wire [13:0] min_from_alarm;
 /*******************************************/
+short_or_long short_or_long(
+    .inc(inc),
+    .clk_10000Hz(clk_10000Hz),
 
-debounce debounce_inc_short(
-    .inp(inc_short),
-    .clk(clk_10000Hz),
-
-    .outp(db_inc_short)
+    .inc_short(db_inc_short),
+    .inc_long(db_inc_long)
 );
 
-debounce debounce_inc_long(
-    .inp(inc_long),
-    .clk(clk_10000Hz),
-
-    .outp(db_inc_long)
-);
 debounce debounce_set(
     .inp(set),
     .clk(clk_10000Hz),

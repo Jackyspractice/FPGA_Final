@@ -24,7 +24,7 @@ always @(posedge clk_10000Hz) begin
     end
     else if (inc == 0 && flag == 0) begin
 
-        if (counter >= 15'b111010100110000) begin//30000
+        if (counter >= 15'h01c2) begin//10000
             inc_long <= 1;
             inc_short <= 0;
             counter <= 0;

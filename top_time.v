@@ -88,7 +88,7 @@ wire [13:0] min_from_alarm;
 /*******************************************/
 short_or_long short_or_long(
     .inc(inc),
-    .clk_10000Hz(clk_10000Hz),
+    .clk(clk_10000Hz),
 
     .inc_short(db_inc_short),
     .inc_long(db_inc_long)
